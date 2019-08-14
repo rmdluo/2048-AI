@@ -4,11 +4,10 @@ import java.util.Random;
 
 public class AI {
 	private Board board;
-	private final int NUM_RUNS;
+	private final int NUM_RUNS = 1000;
 
-	public AI(Board board, int numRuns) {
+	public AI(Board board) {
 		this.board = board;
-		NUM_RUNS = numRuns;
 	}
 
 	public boolean chooseBestMove() {
