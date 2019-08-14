@@ -23,8 +23,7 @@ public class Game2048 {
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		Board board = new Board();
-		Game2048View view = new Game2048View(board);
-		Game2048Controller controller = new Game2048Controller(board, view);
+		Game2048Controller controller = new Game2048Controller(board);
 		controller.runGame();
 	}
 }
