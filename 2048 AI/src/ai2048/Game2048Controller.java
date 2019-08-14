@@ -2,7 +2,6 @@ package ai2048;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.Scanner;
 
 public class Game2048Controller extends Game {
 	private Board board;
@@ -43,14 +42,7 @@ public class Game2048Controller extends Game {
 		brush.fillRect(0, 0, 400, 420);
 		brush.setColor(Color.BLACK);
 		
-		Scanner reader = new Scanner(System.in);
-		
-		System.out.print("How many runs? ");
-		int numRuns = reader.nextInt();
-		
-		reader.close();
-		
-		AI ai = new AI(board, numRuns);
+		AI ai = new AI(board);
 		
 		board.paint(brush);
 		if (board.canMove()) {
