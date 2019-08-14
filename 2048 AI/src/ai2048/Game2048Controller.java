@@ -7,15 +7,13 @@ public class Game2048Controller extends Game {
 	private Board board;
 	private boolean change;
 	
-	public Game2048Controller(Board board, Game2048View view) {
+	public Game2048Controller(Board board) {
 		super("2048", 400, 420);
 
 		this.setFocusable(true);
 		this.requestFocus();
 
 		this.board = board;
-		//this.view = view;
-		this.addKeyListener(view);
 	}
 
 	/**
