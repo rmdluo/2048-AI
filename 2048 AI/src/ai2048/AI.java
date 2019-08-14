@@ -4,10 +4,11 @@ import java.util.Random;
 
 public class AI {
 	private Board board;
-	private final int NUM_RUNS = 1000;
+	private final int NUM_RUNS;
 
-	public AI(Board board) {
+	public AI(Board board, int numRuns) {
 		this.board = board;
+		NUM_RUNS = numRuns;
 	}
 
 	public boolean chooseBestMove() {
@@ -45,12 +46,6 @@ public class AI {
 
 		int[] runAverages = { runTotals[0] / runTypeTotals[0], runTotals[1] / runTypeTotals[1],
 				runTotals[2] / runTypeTotals[2], runTotals[3] / runTypeTotals[3] };
-
-//		System.out.print(runAverages[0]);
-//
-//		for (int i = 1; i < 4; i++) {
-//			System.out.print(", " + runAverages[i]);
-//		}
 
 		int index = 0;
 		int max = runAverages[0];
@@ -101,9 +96,7 @@ public class AI {
 			if (change)
 				tempBoard.addTile();
 		}
-
-		//System.out.println(total);
-		// System.out.println(tempBoard.getScore());
+		
 		return tempBoard.getScore();
 	}
 }
