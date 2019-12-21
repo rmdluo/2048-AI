@@ -15,39 +15,41 @@ public class AI {
 		double[] runTypeTotals = new double[4];
 
 		for (int i = 0; i < NUM_RUNS; i++) {
+			int score;
 			Board tempBoard = board.copyBoard();
-			if (i % 4 == 0) {
+
+			int move = i;
+
+			if (pastMoves[0] == pastMoves[1] && move == pastMoves[0])
+				move = move + 1;
+
+			move = move % 4;
+
+			switch (move) {
+			case 0:
 				tempBoard.left();
-				runTotals[0] += randomRun(tempBoard);
-				runTypeTotals[0]++;
-			}
-
-			if (i % 4 == 1) {
+				break;
+			case 1:
 				tempBoard.right();
-				runTotals[1] += randomRun(tempBoard);
-				runTypeTotals[1]++;
-
-			}
-
-			if (i % 4 == 2) {
+				break;
+			case 2:
 				tempBoard.up();
-				runTotals[2] += randomRun(tempBoard);
-				runTypeTotals[2]++;
-
-			}
-
-			if (i % 4 == 3) {
+				break;
+			case 3:
 				tempBoard.down();
-				runTotals[3] += randomRun(tempBoard);
-				runTypeTotals[3]++;
+				break;
 			}
+
+			score = randomRun(tempBoard);
+			runTotals[move] += score;
+			runTypeTotals[move]++;
 		}
 
-		int[] runAverages = { runTotals[0] / runTypeTotals[0], runTotals[1] / runTypeTotals[1],
+		double[] runAverages = { runTotals[0] / runTypeTotals[0], runTotals[1] / runTypeTotals[1],
 				runTotals[2] / runTypeTotals[2], runTotals[3] / runTypeTotals[3] };
 
 		int index = 0;
-		int max = runAverages[0];
+		double max = runAverages[0];
 
 		for (int i = 1; i < 4; i++) {
 			if (runAverages[i] > max) {
@@ -56,27 +58,29 @@ public class AI {
 			}
 		}
 
-		//System.out.println(", " + max);
+		pastMoves[1] = pastMoves[0];
+		pastMoves[0] = index;
 
-		if (index == 0)
+		switch (index) {
+		case 0:
 			return board.left();
-		if (index == 1)
+		case 1:
 			return board.right();
-		if (index == 2)
+		case 2:
 			return board.up();
-		if (index == 3)
+		case 3:
 			return board.down();
-		return false;
+		default:
+			return false;
+		}
 	}
 
 	private int randomRun(Board tempBoard) {
 		Random randGen = new Random();
 
-		int total = 0;
-		while (tempBoard.canMove() && total < 400) {
+		while (tempBoard.canMove()) {
 			int move = randGen.nextInt(4);
 			boolean change = false;
-			total++;
 			switch (move) {
 			case 0:
 				change = tempBoard.left();
@@ -92,10 +96,11 @@ public class AI {
 				break;
 			}
 
-			if (change)
+			if (change) {
 				tempBoard.addTile();
+			}
 		}
-		
+
 		return tempBoard.getScore();
 	}
 }
