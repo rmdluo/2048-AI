@@ -11,8 +11,8 @@ public class AI {
 	}
 
 	public boolean chooseBestMove() {
-		int[] runTotals = new int[4]; // [left, right, up, down]
-		int[] runTypeTotals = new int[4];
+		double[] runScoreTotals = new double[4]; // [left, right, up, down]
+		double[] runTypeTotals = new double[4];
 
 		for (int i = 0; i < NUM_RUNS; i++) {
 			Board tempBoard = board.copyBoard();
