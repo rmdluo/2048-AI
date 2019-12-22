@@ -1,48 +1,107 @@
 package ai2048;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AI {
 	private Board board;
 	private final int NUM_RUNS = 1000;
+	private int[] pastMoves;
 
 	public AI(Board board) {
 		this.board = board;
+		pastMoves = new int[2];
+		pastMoves[0] = -1;
+		pastMoves[1] = -1;
 	}
 
 	public boolean chooseBestMove() {
-		double[] runScoreTotals = new double[4]; // [left, right, up, down]
+		double[] runTotals = new double[4]; // [left, right, up, down]
 		double[] runTypeTotals = new double[4];
 
-		for (int i = 0; i < NUM_RUNS; i++) {
-			int score;
-			Board tempBoard = board.copyBoard();
+		List<Integer> moves = new ArrayList<Integer>();
+		moves.add(0);
+		moves.add(1);
+		moves.add(2);
+		moves.add(3);
 
-			int move = i;
+		for (int i = 0; i < NUM_RUNS / 4; i++) {
+			Runnable move1 = () -> {
+				int move = 0;
+				int score;
+				Board tempBoard = board.copyBoard();
 
-			if (pastMoves[0] == pastMoves[1] && move == pastMoves[0])
-				move = move + 1;
+				if (pastMoves[0] == pastMoves[1] && move == pastMoves[0])
+					move = move + 1;
 
-			move = move % 4;
-
-			switch (move) {
-			case 0:
 				tempBoard.left();
-				break;
-			case 1:
-				tempBoard.right();
-				break;
-			case 2:
-				tempBoard.up();
-				break;
-			case 3:
-				tempBoard.down();
-				break;
-			}
 
-			score = randomRun(tempBoard);
-			runTotals[move] += score;
-			runTypeTotals[move]++;
+				score = randomRun(tempBoard);
+				runTotals[move] += score;
+				runTypeTotals[move]++;
+			};
+			
+			Runnable move2 = () -> {
+				int move = 1;
+				int score;
+				Board tempBoard = board.copyBoard();
+
+				if (pastMoves[0] == pastMoves[1] && move == pastMoves[0])
+					move = move + 1;
+
+				tempBoard.right();
+
+				score = randomRun(tempBoard);
+				runTotals[move] += score;
+				runTypeTotals[move]++;
+			};
+			
+			Runnable move3 = () -> {
+				int move = 2;
+				int score;
+				Board tempBoard = board.copyBoard();
+
+				if (pastMoves[0] == pastMoves[1] && move == pastMoves[0])
+					move = move + 1;
+
+				tempBoard.up();
+
+				score = randomRun(tempBoard);
+				runTotals[move] += score;
+				runTypeTotals[move]++;
+			};
+			
+			Runnable move4 = () -> {
+				int move = 3;
+				int score;
+				Board tempBoard = board.copyBoard();
+
+				if (pastMoves[0] == pastMoves[1] && move == pastMoves[0])
+					move = 0;
+
+				tempBoard.down();
+
+				score = randomRun(tempBoard);
+				runTotals[move] += score;
+				runTypeTotals[move]++;
+			};
+			
+			ExecutorService executor = Executors.newFixedThreadPool(4);
+			
+			Thread moveThread1 = new Thread(move1);
+			Thread moveThread2 = new Thread(move2);
+			Thread moveThread3 = new Thread(move3);
+			Thread moveThread4 = new Thread(move4);
+			
+			executor.execute(moveThread1);
+			executor.execute(moveThread2);
+			executor.execute(moveThread3);
+			executor.execute(moveThread4);
+			
+			executor.shutdown();	
 		}
 
 		double[] runAverages = { runTotals[0] / runTypeTotals[0], runTotals[1] / runTypeTotals[1],
@@ -78,9 +137,11 @@ public class AI {
 	private int randomRun(Board tempBoard) {
 		Random randGen = new Random();
 
-		while (tempBoard.canMove()) {
+		int numMoves = 0;
+		while (tempBoard.canMove() && numMoves < 2000) {
 			int move = randGen.nextInt(4);
 			boolean change = false;
+			// total++;
 			switch (move) {
 			case 0:
 				change = tempBoard.left();
@@ -98,6 +159,7 @@ public class AI {
 
 			if (change) {
 				tempBoard.addTile();
+				numMoves++;
 			}
 		}
 
