@@ -137,8 +137,9 @@ public class AI {
 	private int randomRun(Board tempBoard) {
 		Random randGen = new Random();
 
-		int numMoves = 0;
-		while (tempBoard.canMove() && numMoves < 2000) {
+		// int total = 0;
+		// int numMoves = 0;
+		while (tempBoard.canMove()) {// && total < 400) {
 			int move = randGen.nextInt(4);
 			boolean change = false;
 			// total++;
@@ -159,10 +160,11 @@ public class AI {
 
 			if (change) {
 				tempBoard.addTile();
-				numMoves++;
+				// numMoves++;
 			}
 		}
 
-		return tempBoard.getScore();
+		// also possible to use numMoves instead of just the score
+		return tempBoard.getScore();// numMoves;
 	}
 }
