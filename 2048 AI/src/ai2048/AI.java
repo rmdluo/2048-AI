@@ -6,6 +6,9 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Class that has the AI and chooses the best moves.
+ */
 public class AI {
 	private Board board;
 	private final int NUM_RUNS = 1000;
@@ -18,17 +21,14 @@ public class AI {
 		pastMoves[1] = -1;
 	}
 
+	//Does the calculations for which move would be the best move
 	public boolean chooseBestMove() {
 		double[] runTotals = new double[4]; // [left, right, up, down]
 		double[] runTypeTotals = new double[4];
-
-		List<Integer> moves = new ArrayList<Integer>();
-		moves.add(0);
-		moves.add(1);
-		moves.add(2);
-		moves.add(3);
-
+		
+		//creates runnable to run simulations
 		for (int i = 0; i < NUM_RUNS / 4; i++) {
+			//runnable for if the next move is left
 			Runnable move1 = () -> {
 				int move = 0;
 				int score;
@@ -44,6 +44,7 @@ public class AI {
 				runTypeTotals[move]++;
 			};
 			
+			//runnable for if the next move is right
 			Runnable move2 = () -> {
 				int move = 1;
 				int score;
@@ -59,6 +60,7 @@ public class AI {
 				runTypeTotals[move]++;
 			};
 			
+			//runnable for if the next move is up
 			Runnable move3 = () -> {
 				int move = 2;
 				int score;
@@ -74,6 +76,7 @@ public class AI {
 				runTypeTotals[move]++;
 			};
 			
+			//runnable for if the next move is down
 			Runnable move4 = () -> {
 				int move = 3;
 				int score;
@@ -89,6 +92,7 @@ public class AI {
 				runTypeTotals[move]++;
 			};
 			
+			//creates the threads from the runnables
 			ExecutorService executor = Executors.newFixedThreadPool(4);
 			
 			Thread moveThread1 = new Thread(move1);
@@ -96,6 +100,7 @@ public class AI {
 			Thread moveThread3 = new Thread(move3);
 			Thread moveThread4 = new Thread(move4);
 			
+			//does parallel processing to run simulations
 			executor.execute(moveThread1);
 			executor.execute(moveThread2);
 			executor.execute(moveThread3);
@@ -103,10 +108,14 @@ public class AI {
 			
 			executor.shutdown();	
 		}
+		
+		//gets the average scores after each possible move
+		double[] runAverages = { runTotals[0] / runTypeTotals[0],
+								 runTotals[1] / runTypeTotals[1],
+								 runTotals[2] / runTypeTotals[2],
+								 runTotals[3] / runTypeTotals[3] }; 
 
-		double[] runAverages = { runTotals[0] / runTypeTotals[0], runTotals[1] / runTypeTotals[1],
-				runTotals[2] / runTypeTotals[2], runTotals[3] / runTypeTotals[3] };
-
+		//gets which move had the highest average
 		int index = 0;
 		double max = runAverages[0];
 
@@ -117,9 +126,11 @@ public class AI {
 			}
 		}
 
+		//updates what the last move
 		pastMoves[1] = pastMoves[0];
 		pastMoves[0] = index;
 
+		//Makes the best move and then returns the new board state
 		switch (index) {
 		case 0:
 			return board.left();
@@ -134,15 +145,21 @@ public class AI {
 		}
 	}
 
+	/**
+	 * Runs a randomized simulation from a given board
+	 * @param tempBoard the start board
+	 * @return the score after the game on the board has ended
+	 */
 	private int randomRun(Board tempBoard) {
 		Random randGen = new Random();
 
-		// int total = 0;
-		// int numMoves = 0;
-		while (tempBoard.canMove()) {// && total < 400) {
+		//does the random moves
+		while (tempBoard.canMove()) {
+			//generates the random move
 			int move = randGen.nextInt(4);
 			boolean change = false;
-			// total++;
+			
+			//actually does the random move
 			switch (move) {
 			case 0:
 				change = tempBoard.left();
@@ -158,13 +175,14 @@ public class AI {
 				break;
 			}
 
+			//checks if anything in the board changed
+			//adds a new tile if something did change
 			if (change) {
 				tempBoard.addTile();
-				// numMoves++;
 			}
 		}
 
-		// also possible to use numMoves instead of just the score
-		return tempBoard.getScore();// numMoves;
+		//returns the end score after simulating
+		return tempBoard.getScore();
 	}
 }
